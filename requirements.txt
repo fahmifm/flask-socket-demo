@@ -2,6 +2,9 @@ autopep8==1.5.3
 click==7.1.2
 Flask==1.1.2
 Flask-SocketIO==4.3.0
+gevent==20.6.0
+gevent-websocket==0.10.1
+greenlet==0.4.16
 itsdangerous==1.1.0
 Jinja2==2.11.2
 MarkupSafe==1.1.1
@@ -15,4 +18,7 @@ python-socketio==4.6.0
 six==1.15.0
 snowballstemmer==2.0.0
 toml==0.10.1
+uWSGI==2.0.18
 Werkzeug==1.0.1
+zope.event==4.4
+zope.interface==5.1.0
