@@ -1,5 +1,7 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO
+from gevent import monkey
+monkey.patch_all()
 
 # init socketio here
 socketio = SocketIO()
