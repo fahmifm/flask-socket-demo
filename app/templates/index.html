@@ -9,42 +9,88 @@
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-    <script type="text/javascript" charset="utf-8">
-        var socket = io('http://localhost:5000/test');
-        socket.on('connect', function () {
-            socket.emit('my event', { data: 'I\'m connected!' });
-        });
-
-        socket.on('my response', function (message) {
-            console.log(message)
-            writeAlert(message)
-        });
-
-        socket.on('message', function (message) {
-            console.log('received messsage', message)
-            writeAlert(message)
-        });
-
-        socket.on('123', function (message) {
-            console.log('received messsage for topic 123', message)
-            writeAlert(message)
-
-        });
-
-        function writeAlert(message){
-            var alert = document.createElement("div")
-            alert.className="alert alert-primary alert-dismissible fade show"
-            alert.setAttribute('role', 'alert')
-            alert.innerHTML=message.data + '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'
-            document.getElementById("message").appendChild(alert)
-        }
-    </script>
 </head>
 <body>
 <div class="container mt-5">
     <h3>Messages</h3>
+    <form class="form-inline">
+        <div class="form-group mr-2">
+            <input type="text" class="form-control" id="inputMessage" placeholder="Enter your message">
+        </div>
+        <a id="sendBtn" class="btn btn-primary">Send</a>
+    </form>
     <hr>
     <div id="message"></div>
 </div>
 </body>
+<script type="text/javascript" charset="utf-8">
+    // var socket = io('https://devws.jublia.com/video', {
+    var socket = io('http://localhost:5000/video', {
+            "transportOptions": {
+                "polling": {
+                    "extraHeaders": {
+                        "j-api-key": "abc"
+                    }
+                }
+            }
+        });
+    socket.on('connect', function () {
+        socket.emit('my event', { data: 'I\'m connected!' });
+        socket.emit('guest_join', {
+            url_code: '123',
+            is_allowed: 1,
+            user_responded: '12345'
+        });
+        // socket.emit('message', 'wwwwwwewewewew');
+    });
+
+    socket.on('response', function (message) {
+        console.log(message)
+        writeAlert(message.data)
+    });
+
+    socket.on('messages', function (message) {
+        message = message.data.message
+        console.log('received messsage', message)
+        writeAlert(message)
+    });
+
+    socket.on('123', function (data) {
+        console.log('received data for topic 123', data)
+        var message = JSON.stringify(data)
+        writeAlert(message)
+    });
+
+    socket.on('test_topic', function (data) {
+            var message = JSON.stringify(data)
+            console.log('received data for test_topic', message)
+            writeAlert(message)
+        });
+
+    function writeAlert(message) {
+        var alert = document.createElement("div")
+        alert.className = "alert alert-primary alert-dismissible fade show"
+        alert.setAttribute('role', 'alert')
+        alert.innerHTML = message + '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'
+        // document.getElementById("message").appendChild(alert)
+        var element = document.getElementById("message")
+        element.insertBefore(alert, element.firstChild);
+    }
+
+    document.getElementById("sendBtn").addEventListener("click", function () {
+        var message = document.getElementById("inputMessage").value
+        console.log(message)
+        var data = {
+            "topic": "messages",
+            "message": {
+                "action": "chat",
+                "data": {
+                    "message": message
+                }
+            }
+        }
+        socket.emit('messages', data)
+        document.getElementById("inputMessage").value = ''
+    });
+</script>
 </html>
